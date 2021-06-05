@@ -11,6 +11,7 @@ from .aroonosc import aroonosc
 from .atr import atr
 from .avgprice import avgprice
 from .beta import beta
+from .bandpass import bandpass
 from .bollinger_bands import bollinger_bands
 from .bollinger_bands_width import bollinger_bands_width
 from .bop import bop
@@ -18,7 +19,9 @@ from .cc import cc
 from .cci import cci
 from .cfo import cfo
 from .cg import cg
+from .cksp import cksp
 from .chande import chande
+from .chop import chop
 from .cmo import cmo
 from .correl import correl
 from .correlation_cycle import correlation_cycle
@@ -57,9 +60,12 @@ from .ht_trendline import ht_trendline
 from .ht_trendmode import ht_trendmode
 from .ichimoku_cloud import ichimoku_cloud
 from .ichimoku_cloud_seq import ichimoku_cloud_seq
+from .ift_rsi import ift_rsi
 from .itrend import itrend
+from .jma import jma
 from .kama import kama
 from .kaufmanstop import kaufmanstop
+from .kdj import kdj
 from .keltner import keltner
 from .kst import kst
 from .kurtosis import kurtosis
@@ -69,6 +75,7 @@ from .linearreg_angle import linearreg_angle
 from .linearreg_intercept import linearreg_intercept
 from .linearreg_slope import linearreg_slope
 from .lrsi import lrsi
+from .ma import ma
 from .macd import macd
 from .macdext import macdext
 from .median_ad import median_ad
@@ -88,9 +95,11 @@ from .natr import natr
 from .nvi import nvi
 from .obv import obv
 from .pattern_recognition import pattern_recognition
+from .pfe import pfe
 from .pivot import pivot
 from .ppo import ppo
 from .pvi import pvi
+from .pwma import pwma
 from .qstick import qstick
 from .reflex import reflex
 from .roc import roc
@@ -117,6 +126,7 @@ from .stochf import stochf
 from .supersmoother import supersmoother
 from .supersmoother_3_pole import supersmoother_3_pole
 from .supertrend import supertrend
+from .swma import swma
 from .t3 import t3
 from .tema import tema
 from .trange import trange

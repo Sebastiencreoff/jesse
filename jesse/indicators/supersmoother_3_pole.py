@@ -1,7 +1,10 @@
 from typing import Union
 
 import numpy as np
-from numba import njit
+try:
+    from numba import njit
+except ImportError:
+    njit = lambda a : a
 
 from jesse.helpers import get_candle_source, slice_candles
 
@@ -21,12 +24,11 @@ def supersmoother_3_pole(candles: np.ndarray, period: int = 14, source_type: str
     :return: float | np.ndarray
     """
 
-    candles = slice_candles(candles, sequential)
-
     # Accept normal array too.
     if len(candles.shape) == 1:
         source = candles
     else:
+        candles = slice_candles(candles, sequential)
         source = get_candle_source(candles, source_type=source_type)
 
     res = supersmoother_fast(source, period)

@@ -406,6 +406,9 @@ def normalize(x: float, x_min: float, x_max: float) -> float:
 
 
 def now() -> int:
+    """
+    Always returns the current time in milliseconds but rounds time in matter of seconds
+    """
     return now_to_timestamp()
 
 
@@ -448,9 +451,10 @@ def opposite_side(s: str) -> str:
 
     if s == sides.BUY:
         return sides.SELL
-    if s == sides.SELL:
+    elif s == sides.SELL:
         return sides.BUY
-    raise ValueError('unsupported side')
+    else:
+        raise ValueError(f'{s} is not a valid input for side')
 
 
 def opposite_type(t: str) -> str:
@@ -514,11 +518,10 @@ def orderbook_trim_price(p: float, ascending: bool, unit: float) -> float:
 def prepare_qty(qty: float, side: str) -> float:
     if side.lower() in ('sell', 'short'):
         return -abs(qty)
-
-    if side.lower() in ('buy', 'long'):
+    elif side.lower() in ('buy', 'long'):
         return abs(qty)
-
-    raise TypeError()
+    else:
+        raise ValueError(f'{side} is not a valid input')
 
 
 def python_version() -> float:
@@ -563,62 +566,36 @@ def relative_to_absolute(path: str) -> str:
     return os.path.abspath(path)
 
 
-def round_price_for_live_mode(price: float, roundable_price: float, precision: int = 0) -> Union[float, np.ndarray]:
+def round_price_for_live_mode(price, precision: int) -> Union[float, np.ndarray]:
     """
     Rounds price(s) based on exchange requirements
 
     :param price: float
-    :param roundable_price: float
+    :param precision: int
     :return: float | nd.array
     """
-
-    if precision == 0:
-        n = int(math.log10(price))
-
-        if price < 1:
-            price_round_precision = abs(n - 4)
-        else:
-            price_round_precision = 3 - n
-            if price_round_precision < 0:
-                price_round_precision = 0
-    else:
-        price_round_precision = precision
-
-    return np.round(roundable_price, price_round_precision)
+    return np.round(price, precision)
 
 
-def round_qty_for_live_mode(price: float, roundable_qty: float, precision: int = 0) -> Union[float, np.ndarray]:
+def round_qty_for_live_mode(roundable_qty: float, precision: int) -> Union[float, np.ndarray]:
     """
     Rounds qty(s) based on exchange requirements
 
-    :param price: float
     :param roundable_qty: float | nd.array
+    :param precision: int
     :return: float | nd.array
     """
-
-    if precision == 0:
-        n = int(math.log10(price))
-
-        if price < 1:
-            qty_round_precision = 0
-        else:
-            qty_round_precision = n + 1
-            if qty_round_precision > 3:
-                qty_round_precision = 3
-    else:
-        qty_round_precision = precision
-
     # for qty rounding down is important to prevent InsufficenMargin
-    rounded = np.array([round_decimals_down(value, qty_round_precision) for value in roundable_qty])
+    rounded = round_decimals_down(roundable_qty, precision)
 
     for index, q in enumerate(rounded):
         if q == 0.0:
-            rounded[index] = 0.001
+            rounded[index] = 1 / 10 ** precision
 
     return rounded
 
 
-def round_decimals_down(number: float, decimals: int = 2) -> float:
+def round_decimals_down(number: np.ndarray, decimals: int = 2) -> float:
     """
     Returns a value rounded down to a specific number of decimal places.
     """
@@ -627,10 +604,10 @@ def round_decimals_down(number: float, decimals: int = 2) -> float:
     elif decimals < 0:
       raise ValueError("decimal places has to be 0 or more")
     elif decimals == 0:
-      return math.floor(number)
+      return np.floor(number)
 
     factor = 10 ** decimals
-    return math.floor(number * factor) / factor
+    return np.floor(number * factor) / factor
 
 
 def same_length(bigger: np.ndarray, shorter: np.ndarray) -> np.ndarray:
@@ -696,8 +673,12 @@ def error(msg: str, force_print: bool = False) -> None:
         from jesse.services import logger
         logger.error(msg)
         if force_print:
+            print('\n')
+            print(color('========== critical error =========='.upper(), 'red'))
             print(color(msg, 'red'))
     else:
+        print('\n')
+        print(color('========== critical error =========='.upper(), 'red'))
         print(color(msg, 'red'))
 
 
@@ -772,3 +753,12 @@ def unique_list(arr) -> list:
     seen = set()
     seen_add = seen.add
     return [x for x in arr if not (x in seen or seen_add(x))]
+
+
+def closing_side(position_type: str) -> str:
+    if position_type.lower() == 'long':
+        return 'sell'
+    elif position_type.lower() == 'short':
+        return 'buy'
+    else:
+        raise ValueError(f'Value entered for position_type ({position_type}) is not valid')

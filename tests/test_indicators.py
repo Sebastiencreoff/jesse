@@ -160,6 +160,23 @@ def test_beta():
     assert seq[-1] == single
 
 
+def test_bandpass():
+    candles = np.array(mama_candles)
+
+    bp = ta.bandpass(candles)
+    assert type(bp).__name__ == 'BandPass'
+    assert round(bp.bp, 2) == -7.56
+    assert round(bp.bp_normalized, 2) == -0.29
+    assert bp.signal == 1
+    assert round(bp.trigger, 2) == -0.27
+
+    seq_bp = ta.bandpass(candles, sequential=True)
+    assert seq_bp.bp[-1] == bp.bp
+    assert len(seq_bp.bp) == len(candles)
+    assert len(seq_bp.bp_normalized) == len(candles)
+    assert len(seq_bp.signal) == len(candles)
+    assert len(seq_bp.trigger) == len(candles)
+
 def test_bollinger_bands():
     candles = np.array(bollinger_bands_candles)
 
@@ -263,6 +280,32 @@ def test_chande():
     assert seq_long[-1] == single_long
     assert seq_short[-1] == single_short
 
+
+def test_chop():
+    # use the same candles as mama_candles
+    candles = np.array(mama_candles)
+
+    single = ta.chop(candles)
+    seq = ta.chop(candles, sequential=True)
+
+    assert round(single, 2) == 28.82
+    assert len(seq) == len(candles)
+    assert seq[-1] == single
+
+
+def test_cksp():
+    candles = np.array(mama_candles)
+
+    single = ta.cksp(candles)
+    assert type(single).__name__ == 'CKSP'
+    assert round(single.long, 2) == 247.62
+    assert round(single.short, 2) == 127.89
+
+    seq = ta.cksp(candles, sequential=True)
+    assert seq.long[-1] == single.long
+    assert seq.short[-1] == single.short
+    assert len(seq.long) == len(candles)
+    assert len(seq.short) == len(candles)
 
 def test_cmo():
     # use the same candles as mama_candles
@@ -729,6 +772,17 @@ def test_ichimoku_cloud_seq():
     assert len(seq.conversion_line) == len(candles)
 
 
+def test_ift_rsi():
+    # use the same candles as dema_candles
+    candles = np.array(mama_candles)
+
+    single = ta.ift_rsi(candles)
+    seq = ta.ift_rsi(candles, sequential=True)
+
+    assert round(single, 2) == 0.89
+    assert len(seq) == len(candles)
+    assert seq[-1] == single
+
 def test_itrend():
     candles = np.array(mama_candles)
     single = ta.itrend(candles)
@@ -743,6 +797,18 @@ def test_itrend():
     assert seq.signal[-1] == single.signal
     assert seq.trigger[-1] == single.trigger
     assert len(seq.it) == len(candles)
+
+
+def test_jma():
+    # use the same candles as dema_candles
+    candles = np.array(mama_candles)
+
+    single = ta.jma(candles)
+    seq = ta.jma(candles, sequential=True)
+
+    assert round(single, 2) == 156.72
+    assert len(seq) == len(candles)
+    assert seq[-1] == single
 
 
 def test_kama():
@@ -767,6 +833,23 @@ def test_kaufmanstop():
     assert round(single, 0) == -57
     assert len(seq) == len(candles)
     assert seq[-1] == single
+
+
+def test_kdj():
+    candles = np.array(mama_candles)
+
+    kd = ta.kdj(candles)
+    k, d, j = kd
+    assert type(kd).__name__ == 'KDJ'
+    assert round(k, 1) == 13.3
+    assert round(d, 1) == 15.7
+    assert round(j, 1) == 8.6
+
+    seq_kd = ta.kdj(candles, sequential=True)
+    assert seq_kd.k[-1] == k
+    assert len(seq_kd.k) == len(candles)
+    assert len(seq_kd.d) == len(candles)
+    assert len(seq_kd.j) == len(candles)
 
 
 def test_kelner_channels():
@@ -882,6 +965,23 @@ def test_lrsi():
     assert round(single, 2) == 0.1
     assert round(seq[-2], 2) == 0.04
     assert len(seq) == len(candles)
+    assert seq[-1] == single
+
+
+def test_ma():
+    # use the same candles as mama_candles
+    candles = np.array(mama_candles)
+
+    single = ta.ma(candles, matype=9)
+    seq = ta.ma(candles, matype=9, sequential=True)
+
+    seq_average = ta.ma(seq, matype=9, sequential=True)
+
+    assert round(single, 2) == 166.99
+    assert round(seq[-2], 2) == 203.56
+    assert round(seq_average[-2], 2) == 212.12
+    assert len(seq) == len(candles)
+    assert len(seq_average) == len(candles)
     assert seq[-1] == single
 
 
@@ -1141,6 +1241,18 @@ def test_pattern_recognizion():
     assert res == 1
 
 
+def test_pfe():
+  # use the same candles as mama_candles
+  candles = np.array(mama_candles)
+
+  single = ta.pfe(candles)
+  seq = ta.pfe(candles, sequential=True)
+
+  assert round(single, 2) == -211.85
+  assert len(seq) == len(candles)
+  assert seq[-1] == single
+
+
 def test_pivot():
     candles = np.array(mama_candles)
     single = ta.pivot(candles, mode=0)
@@ -1249,16 +1361,27 @@ def test_ppo():
 
 
 def test_pvi():
+  # use the same candles as mama_candles
+  candles = np.array(mama_candles)
+
+  single = ta.pvi(candles)
+  seq = ta.pvi(candles, sequential=True)
+
+
+  assert round(single, 0) == 661
+  assert len(seq) == len(candles)
+  assert seq[-1] == single
+
+def test_pwma():
     # use the same candles as mama_candles
     candles = np.array(mama_candles)
 
-    single = ta.pvi(candles)
-    seq = ta.pvi(candles, sequential=True)
+    single = ta.pwma(candles)
+    seq = ta.pwma(candles, sequential=True)
 
-    assert round(single, 0) == 661
+    assert round(single, 2) == 193.82
     assert len(seq) == len(candles)
     assert seq[-1] == single
-
 
 def test_qstick():
     # use the same candles as mama_candles
@@ -1580,6 +1703,18 @@ def test_supertrend():
     assert seq.trend[-1] == single.trend
     assert len(seq.trend) == len(candles)
     assert len(seq.changed) == len(candles)
+
+
+def test_swma():
+    # use the same candles as mama_candles
+    candles = np.array(mama_candles)
+
+    single = ta.swma(candles)
+    seq = ta.swma(candles, sequential=True)
+
+    assert round(single, 2) == 189.35
+    assert len(seq) == len(candles)
+    assert seq[-1] == single
 
 
 def test_t3():

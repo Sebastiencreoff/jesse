@@ -30,6 +30,8 @@ def test_base_asset():
     assert jh.base_asset('DEFI-USD') == 'DEFI'
 
 
+
+
 def test_binary_search():
     arr = [0, 11, 22, 33, 44, 54, 55]
 
@@ -391,7 +393,7 @@ def test_prepare_qty():
     assert jh.prepare_qty(10, 'sell') == -10
     assert jh.prepare_qty(-10, 'buy') == 10
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         jh.prepare_qty(-10, 'invalid_input')
 
 
@@ -421,70 +423,35 @@ def test_relative_to_absolute():
 
 def test_round_price_for_live_mode():
     np.testing.assert_equal(
-        jh.round_price_for_live_mode(0.0003209123456, np.array([0.0003209123456, 0.0004209123456])),
+        jh.round_price_for_live_mode(np.array([0.0003209123456, 0.0004209123456]), 7),
         np.array([0.0003209, 0.0004209])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(0.003209123456, np.array([0.003209123456, 0.004209123456])),
-        np.array([0.003209, 0.004209])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(0.01117123456, np.array([0.01117123456, 0.02117123456])),
-        np.array([0.01117, 0.02117])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(0.1592123456, np.array([0.1592123456, 0.2592123456])),
-        np.array([0.1592, 0.2592])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(2.123456, np.array([2.123456, 1.123456])),
-        np.array([2.123, 1.123])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(137.123456, np.array([137.123456, 837.123456])),
-        np.array([137.1, 837.1])
-    )
-    np.testing.assert_equal(
-        jh.round_price_for_live_mode(6700.123456, np.array([6700.123456, 1000.123456])),
-        np.array([6700, 1000])
     )
 
 
 def test_round_qty_for_live_mode():
     np.testing.assert_equal(
-        jh.round_qty_for_live_mode(0.0003209123456, np.array([100.0003209123456, 100.0004209123456])),
-        np.array([100, 100])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(0.003209123456, np.array([100.003209123456, 100.004209123456])),
-        np.array([100, 100])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(0.01117123456, np.array([100.01117123456, 100.02117123456])),
-        np.array([100, 100])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(0.1592123456, np.array([100.1592123456, 100.2592123456])),
-        np.array([100, 100])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(2.123456, np.array([2.123456, 1.123456])),
-        np.array([2.1, 1.1])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(137.123456, np.array([137.123456, 837.123456])),
-        np.array([137.123, 837.123])
-    )
-    np.testing.assert_equal(
-        jh.round_qty_for_live_mode(6700.123456, np.array([0.123456, 0.124456])),
-        np.array([0.123, 0.124])
+        jh.round_qty_for_live_mode(np.array([100.3209123456, 100.4299123456]), 2),
+        np.array([100.32, 100.42])
     )
 
-    # assert that orders smaller than 0.001 will get rounded to 0.001 because that's the minimum order qty on Binance
     np.testing.assert_equal(
-        jh.round_qty_for_live_mode(6700.123456, np.array([0.0005, 0.0004])),
-        np.array([0.001, 0.001])
+        jh.round_qty_for_live_mode(np.array([0]), 1),
+        np.array([0.1])
     )
+
+    np.testing.assert_equal(
+        jh.round_qty_for_live_mode(np.array([0]), 2),
+        np.array([0.01])
+    )
+
+    np.testing.assert_equal(
+        jh.round_qty_for_live_mode(np.array([0]), 3),
+        np.array([0.001])
+    )
+
+
+def test_round_decimals_down():
+    assert jh.round_decimals_down(100.329, 2) == 100.32
 
 
 def test_secure_hash():
@@ -568,3 +535,8 @@ def test_unique_list():
     ]
 
     assert jh.unique_list(a) == expected
+
+
+def test_closing_side():
+    assert jh.closing_side('Long') == 'sell'
+    assert jh.closing_side('Short') == 'buy'
